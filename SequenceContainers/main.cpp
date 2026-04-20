@@ -2,6 +2,7 @@
 #include <array>
 #include <vector>
 #include <string>
+#include <deque>
 using std::cin;
 using std::cout;
 using std::endl;
@@ -10,7 +11,8 @@ using std::endl;
 #define delimeter "\n-------------------------------------------------------------------\n"
 
 //#define STL_ARRAY
-#define STL_VECTOR
+//#define STL_VECTOR
+#define STL_DEQUE
 
 template<typename T> void vector_properties(const std::vector<T>& vec)
 {
@@ -40,7 +42,7 @@ int main()
 
 	i_vec.erase(i_vec.begin());
 	i_vec.insert(i_vec.begin()+4,100);
-	for (int i : i_vec)cout << i << tab;
+	for (int i : i_vec) cout << i << tab;
 	cout << endl;
 	vector_properties(i_vec);
 
@@ -48,12 +50,40 @@ int main()
 	i_vec.shrink_to_fit();
 	vector_properties(i_vec);
 	i_vec.resize(5);
-	for (int i : i_vec)cout << i << tab;
+	for (int i : i_vec) cout << i << tab;
+	cout << endl;
 	vector_properties(i_vec);
-	//std::vector<double> d_vec;
-	//vector_properties(d_vec);
+	cout << "Front:\t" << i_vec.front()<<endl;
+	cout << "Back:\t" << i_vec.back()<<endl;
+	
+	int index, value;
+	cout << "Введите индекс добавляемого элемента:"; cin >> index;
+	cout << "Введите значение добавляемого элемента:"; cin >> value;
+	if(index<=i_vec.size())
+		i_vec.insert(i_vec.begin() + index, value);
+	for (std::vector<int>::iterator it = i_vec.begin(); it != i_vec.end(); ++it)
+	{
+		cout << *it << tab;
+	}
+	cout <<  endl;
 #endif // STL_VECTOR
 
+#ifdef STL_DEQUE
+	std::deque<int> i_deque = { 3,5,8,13,21 };
+	for (int i = 0; i < i_deque.size(); i++)
+	{
+		cout << i_deque[i] << tab;
+	}
+	cout << endl;
+	i_deque.push_front(1);
+	i_deque.push_front(1);
+	i_deque.push_front(0);
+	for (std::deque<int>::iterator it = i_deque.begin(); it != i_deque.end(); ++it)
+	{
+		cout << *it << tab;
+	}
+	cout << endl;
+#endif // DEQUE
 
 
 
