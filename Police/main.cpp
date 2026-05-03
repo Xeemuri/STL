@@ -1,9 +1,10 @@
-#define _CRT_SECURE_NO_WARNINGS
+п»ї#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <string>
 #include <map>
 #include <list>
 #include <ctime>
+#include <fstream>
 
 using std::cin;
 using std::cout;
@@ -14,19 +15,19 @@ using std::endl;
 
 const std::map<int, std::string> OFFENCES =
 {
-	std::pair<int, std::string>(1, "Парковка в неположенном месте"),
-	std::pair<int, std::string>(2, "Непристегнутый ремень безопасности"),
-	std::pair<int, std::string>(3, "Превышение скорости"),
-	std::pair<int, std::string>(4, "Пересечение сплошной"),
-	std::pair<int, std::string>(5, "Вождение в нетрезвом состоянии"),
-	std::pair<int, std::string>(6, "Оскорбление офицера"),
-	std::pair<int, std::string>(7, "Проезд на красный сигнал светофора"),
+	std::pair<int, std::string>(1, "РџР°СЂРєРѕРІРєР° РІ РЅРµРїРѕР»РѕР¶РµРЅРЅРѕРј РјРµСЃС‚Рµ"),
+	std::pair<int, std::string>(2, "РќРµРїСЂРёСЃС‚РµРіРЅСѓС‚С‹Р№ СЂРµРјРµРЅСЊ Р±РµР·РѕРїР°СЃРЅРѕСЃС‚Рё"),
+	std::pair<int, std::string>(3, "РџСЂРµРІС‹С€РµРЅРёРµ СЃРєРѕСЂРѕСЃС‚Рё"),
+	std::pair<int, std::string>(4, "РџРµСЂРµСЃРµС‡РµРЅРёРµ СЃРїР»РѕС€РЅРѕР№"),
+	std::pair<int, std::string>(5, "Р’РѕР¶РґРµРЅРёРµ РІ РЅРµС‚СЂРµР·РІРѕРј СЃРѕСЃС‚РѕСЏРЅРёРё"),
+	std::pair<int, std::string>(6, "РћСЃРєРѕСЂР±Р»РµРЅРёРµ РѕС„РёС†РµСЂР°"),
+	std::pair<int, std::string>(7, "РџСЂРѕРµР·Рґ РЅР° РєСЂР°СЃРЅС‹Р№ СЃРёРіРЅР°Р» СЃРІРµС‚РѕС„РѕСЂР°"),
 };
 
 class Offence
 {
 	std::string location;
-	tm time; //Структура tm описывает дату и время
+	tm time; //РЎС‚СЂСѓРєС‚СѓСЂР° tm РѕРїРёСЃС‹РІР°РµС‚ РґР°С‚Сѓ Рё РІСЂРµРјСЏ
 	int offence;
 public:
 	const std::string& get_location()const
@@ -74,6 +75,7 @@ public:
 
 		return this->time;
 	}
+
 };
 std::ostream& operator<<(std::ostream& os, const Offence& obj)
 {
@@ -83,24 +85,56 @@ std::ostream& operator<<(std::ostream& os, const Offence& obj)
 		<< obj.get_location() << tab
 		<< OFFENCES.at(obj.get_offence());
 }
+std::ostream& operator<<(std::ostream& os, const std::list<Offence>& offences)
+{
+	for (Offence i : offences) os << i << endl;
+	return os;
+}
 
+void get_from_file(const std::string& filename)
+{
+	std::ifstream fin(filename);
+	std::string line;
+	while (std::getline(fin, line))
+	{
+		cout << line << endl;
+	}
+	fin.close();
+}
+void save_to_file(std::map<std::string, std::list<Offence>>& base, const std::string& filename)
+{
+	std::ofstream fout(filename);
+	for (std::pair<std::string, std::list<Offence>> i : base)
+	{
+		fout << i.first << ": " << endl << i.second;
+	}
+	fout.close();
+}
 //#define OFFENCE_CHECK
 
 int main()
 {
-#ifdef OFFENCE_CHECK
 	setlocale(LC_ALL, "");
-	Offence offence("Улица Ленина", "2026.04.29 11:52", 2);
+#ifdef OFFENCE_CHECK
+	Offence offence("РЈР»РёС†Р° Р›РµРЅРёРЅР°", "2026.04.29 11:52", 2);
 	cout << offence << endl;
 
-	Offence offence2("Переулок Космический", time(NULL), 2);
+	Offence offence2("РџРµСЂРµСѓР»РѕРє РљРѕСЃРјРёС‡РµСЃРєРёР№", time(NULL), 2);
 	cout << offence2 << endl;
 	cout << time(NULL);
 #endif // OFFENCE_CHECK
 
 	std::map<std::string, std::list<Offence>> base =
 	{
-		std::pair<std::string,std::list<Offence>>{"A123BB",{Offence("Улица Ленина 22", 1777455953,5), Offence("Улица Космонавтов", "2016.10.16 17:30",2)}}
+		std::pair<std::string,std::list<Offence>>{"A123BB",{Offence("РЈР»РёС†Р° Р›РµРЅРёРЅР° 22", 1777455953,5), Offence("РЈР»РёС†Р° РљРѕСЃРјРѕРЅР°РІС‚РѕРІ 33", "2016.10.16 17:30",2)}},
+		std::pair<std::string,std::list<Offence>>{"O777OO",{Offence("РћРєРµР°РЅСЃРєРёР№ РїСЂРѕСЃРїРµРєС‚ 11", 1777455953,4), Offence("РЈР»РёС†Р° РџСѓС€РєРёРЅСЃРєР°СЏ 10", "2016.10.16 17:30",6)}},
+		std::pair<std::string,std::list<Offence>>{"H228YP",{Offence("РЈР»РёС†Р° Р‘РѕСЂРёСЃРµРЅРєРѕ 110", 1777455953,3), Offence("РЈР»РёС†Р° РќРёРєРёС„РѕСЂРѕРІР° 55", "2016.10.16 17:30",5)}},
 	};
+
+
+	cout << "\t\t\t\tРџРћР›РќРђРЇ Р‘РђР—Рђ РџР РђР’РћРќРђР РЈРЁРРўР•Р›Р•Р™: \n";
+	get_from_file("police_base.txt");
+	save_to_file(base, "police_base.txt");
+	cout << delimiter;
 	cout << base.at("A123BB");
 }

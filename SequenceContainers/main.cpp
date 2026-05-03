@@ -21,8 +21,8 @@ template<typename T> void vector_properties(const std::vector<T>& vec)
 //#define STL_ARRAY
 //#define STL_VECTOR
 //#define STL_DEQUE
-//#define STL_LIST
-#define STL_FORWARD_LIST
+#define STL_LIST
+//#define STL_FORWARD_LIST
 
 int main()
 {
@@ -107,6 +107,14 @@ int main()
 
 	for (int i : i_list)cout << i << tab;
 	cout << endl;
+
+	cout << "Введите индекс добавляемого элемента:"; cin >> index;
+	position = i_list.begin();
+	std::advance(position, index);
+	i_list.erase(position);
+	for (int i : i_list)cout << i << tab;
+	cout << endl;
+
 	cout << i_list.size();
 	//i_list.erase(i_list.begin() + index);
 
@@ -119,28 +127,31 @@ int main()
 		cout << *it << tab;
 	}
 	cout << endl;
-	i_flist.push_front(10);
 	int index;
 	int value;
 	cout << "введите индекс добавляемого элемента: "; cin >> index;
-	cout << "введите znachenie добавляемого элемента: "; cin >> value;
-	/*bool less_then_10(const int value)
-	{
-		return value < 10;
-	}*/
+	cout << "введите значение добавляемого элемента: "; cin >> value;
 
-	i_flist.remove_if([](const int value) {return value % 2; });
-	//std::forward_list<int>::iterator position = i_flist.begin();
-	//if (index > 0 && index < std::distance(i_flist.begin(), i_flist.end()))
-	//{
-	//	std::advance(position, index - 1);
-	//	i_flist.insert_after(position, value);
-	//}
-	//for (int i = 0; i < index-1; i++) ++position;
-	//i_flist.insert_after(position, value);
-	i_flist.remove(13);
+	std::forward_list<int>::iterator position = i_flist.begin();
+	if (index > 0 && index < std::distance(i_flist.begin(), i_flist.end()))
+	{
+		std::advance(position, index - 1);
+		i_flist.insert_after(position, value);
+	}
 	for (int i : i_flist) cout << i << tab;
 	cout << endl;
+
+	cout << "введите индекс удаляемого элемента: "; cin >> index;
+
+	position = i_flist.begin();
+	if (index > 0 && index < std::distance(i_flist.begin(), i_flist.end()))
+	{
+		std::advance(position, index - 1);
+		i_flist.erase_after(position);
+	}
+	for (int i : i_flist) cout << i << tab;
+	cout << endl;
+	//i_flist.remove_if([](const int value) {return value % 2; });
 #endif // STL_FORWARD_LIST
 
 }
