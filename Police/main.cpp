@@ -42,6 +42,12 @@ public:
 	{
 		return offence;
 	}
+	time_t get_timestamp()const
+	{
+		tm time = this->time;
+		tm* p_time = &time;
+		return mktime(p_time);
+	}
 
 	Offence(const std::string& location, const char* time, int offence)
 	{
@@ -91,6 +97,24 @@ std::ostream& operator<<(std::ostream& os, const std::list<Offence>& offences)
 	return os;
 }
 
+std::ofstream& operator<<(std::ofstream& ofs, const Offence& obj)
+{
+	ofs << obj.get_timestamp() << " " << obj.get_offence() << " " << obj.get_location();
+	return ofs;
+}
+void Print(const std::map<std::string, std::list<Offence>>& base)
+{
+	for (std::map<std::string, std::list<Offence>>::const_iterator it = base.begin();it != base.end();++it)
+	{
+		cout << it->first << ":\n";
+		for (
+			std::list<Offence>::const_iterator of_it = it->second.begin();of_it != it->second.end();++it)
+		{
+			cout << tab << *of_it << endl;
+		}
+		cout << delimiter << endl;
+	}
+}
 void get_from_file(const std::string& filename)
 {
 	std::ifstream fin(filename);
@@ -104,10 +128,17 @@ void get_from_file(const std::string& filename)
 void save_to_file(std::map<std::string, std::list<Offence>>& base, const std::string& filename)
 {
 	std::ofstream fout(filename);
-	for (std::pair<std::string, std::list<Offence>> i : base)
+	for (std::map<std::string, std::list<Offence>>::const_iterator it = base.begin(); it != base.end(); ++it)
 	{
-		fout << i.first << ": " << endl << i.second;
+		fout << it->first << ": ";
+		for (std::list<Offence>::const_iterator of_it = it->second.begin(); of_it != it->second.end(); ++of_it)
+		{
+			fout << *of_it << ",";
+		}
+		fout.seekp(-1, std::ios::cur);
+		fout << ';' << endl;
 	}
+	
 	fout.close();
 }
 //#define OFFENCE_CHECK
@@ -133,8 +164,8 @@ int main()
 
 
 	cout << "\t\t\t\tПОЛНАЯ БАЗА ПРАВОНАРУШИТЕЛЕЙ: \n";
-	get_from_file("police_base.txt");
 	save_to_file(base, "police_base.txt");
+	get_from_file("police_base.txt");
 	cout << delimiter;
 	cout << base.at("A123BB");
 }
