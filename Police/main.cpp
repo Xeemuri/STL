@@ -125,6 +125,27 @@ void get_from_file(const std::string& filename)
 	}
 	fin.close();
 }
+
+std::map<std::string, std::list<Offence>> Load(const std::string& filename)
+{
+	std::map<std::string, std::list<Offence>> base;
+	std::ifstream fin(filename);
+	if (fin.is_open())
+	{
+		std::string license_plate;
+		std::string all_violations;
+		std::getline(fin, license_plate, ':');
+		std::getline(fin, all_violations, ':');
+		cout << license_plate << endl;
+		cout << all_violations << endl;
+		cout << delimiter << endl;
+	}
+	else
+	{
+		std::cerr << "Error: File not found" << endl;
+	}
+	return base;
+}
 void save_to_file(std::map<std::string, std::list<Offence>>& base, const std::string& filename)
 {
 	std::ofstream fout(filename);
@@ -142,6 +163,7 @@ void save_to_file(std::map<std::string, std::list<Offence>>& base, const std::st
 	fout.close();
 }
 //#define OFFENCE_CHECK
+//#define PRINT_AND_SAVE_CHECK
 
 int main()
 {
@@ -155,6 +177,7 @@ int main()
 	cout << time(NULL);
 #endif // OFFENCE_CHECK
 
+#ifdef PRINT_AND_SAVE_CHECK
 	std::map<std::string, std::list<Offence>> base =
 	{
 		std::pair<std::string,std::list<Offence>>{"A123BB",{Offence("Улица Ленина 22", 1777455953,5), Offence("Улица Космонавтов 33", "2016.10.16 17:30",2)}},
@@ -163,9 +186,10 @@ int main()
 	};
 
 
-	cout << "\t\t\t\tПОЛНАЯ БАЗА ПРАВОНАРУШИТЕЛЕЙ: \n";
 	save_to_file(base, "police_base.txt");
-	get_from_file("police_base.txt");
-	cout << delimiter;
-	cout << base.at("A123BB");
+#endif // PRINT_AND_SAVE_CHECK
+
+	std::map<std::string, std::list<Offence>> base = Load("police_base.txt");
+	cout << "\t\t\t\tПОЛНАЯ БАЗА ПРАВОНАРУШИТЕЛЕЙ: \n";
+
 }
