@@ -1,6 +1,7 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <map>
 #include <list>
 #include <ctime>
@@ -15,6 +16,7 @@ using std::endl;
 
 const std::map<int, std::string> OFFENCES =
 {
+	std::pair<int, std::string>(0, "N/A"),
 	std::pair<int, std::string>(1, "Парковка в неположенном месте"),
 	std::pair<int, std::string>(2, "Непристегнутый ремень безопасности"),
 	std::pair<int, std::string>(3, "Превышение скорости"),
@@ -48,7 +50,6 @@ public:
 		tm* p_time = &time;
 		return mktime(p_time);
 	}
-
 	Offence(const std::string& location, const char* time, int offence)
 	{
 		char time_buffer[32] = {};
@@ -58,7 +59,7 @@ public:
 		this->get_time_from_string(time_buffer);
 		this->offence = offence;
 	}
-	Offence(const std::string& location, time_t timestamp, int offence)
+	explicit Offence(const std::string& location = "N/A", time_t timestamp = 0, int offence = 0)
 	{
 		this->location = location;
 		this->time = *localtime(&timestamp);
@@ -102,13 +103,33 @@ std::ofstream& operator<<(std::ofstream& ofs, const Offence& obj)
 	ofs << obj.get_timestamp() << " " << obj.get_offence() << " " << obj.get_location();
 	return ofs;
 }
+
+std::istream& operator>>(std::istream& is, Offence& obj)
+{
+	time_t timestamp;
+	int offence_id;
+	std::string location;
+
+	is >> timestamp >> offence_id;
+	std::getline(is, location);
+	location[location.size() - 1] = 0;
+	obj = Offence(location, timestamp, offence_id);
+	return is;
+}
 void Print(const std::map<std::string, std::list<Offence>>& base)
 {
-	for (std::map<std::string, std::list<Offence>>::const_iterator it = base.begin();it != base.end();++it)
+	for (
+		std::map<std::string, std::list<Offence>>::const_iterator it = base.begin();
+		it != base.end();
+		++it
+		)
 	{
 		cout << it->first << ":\n";
 		for (
-			std::list<Offence>::const_iterator of_it = it->second.begin();of_it != it->second.end();++it)
+			std::list<Offence>::const_iterator of_it = it->second.begin();
+			of_it != it->second.end();
+			++of_it
+			)
 		{
 			cout << tab << *of_it << endl;
 		}
@@ -132,13 +153,26 @@ std::map<std::string, std::list<Offence>> Load(const std::string& filename)
 	std::ifstream fin(filename);
 	if (fin.is_open())
 	{
-		std::string license_plate;
-		std::string all_violations;
-		std::getline(fin, license_plate, ':');
-		std::getline(fin, all_violations, ':');
-		cout << license_plate << endl;
-		cout << all_violations << endl;
-		cout << delimiter << endl;
+		while (!fin.eof())
+		{
+			std::string license_plate;
+			char all_violations[1024] = {};
+			std::getline(fin, license_plate, ':');
+			fin.getline(all_violations, 1024);
+			if (license_plate.size() < 1)continue;
+			cout << license_plate << endl;
+			cout << all_violations << endl;
+			char delimiters[] = ",;";
+			for (char* pch = strtok(all_violations, delimiters); pch; pch = strtok(NULL, delimiters))
+			{
+				std::stringstream s_stream;
+				Offence violation;
+				s_stream << pch;
+				s_stream >> violation;
+				base[license_plate].push_back(violation);
+			}
+			cout << delimiter << endl;
+		}
 	}
 	else
 	{
@@ -159,11 +193,13 @@ void save_to_file(std::map<std::string, std::list<Offence>>& base, const std::st
 		fout.seekp(-1, std::ios::cur);
 		fout << ';' << endl;
 	}
-	
+
 	fout.close();
 }
 //#define OFFENCE_CHECK
 //#define PRINT_AND_SAVE_CHECK
+
+
 
 int main()
 {
@@ -190,6 +226,8 @@ int main()
 #endif // PRINT_AND_SAVE_CHECK
 
 	std::map<std::string, std::list<Offence>> base = Load("police_base.txt");
-	cout << "\t\t\t\tПОЛНАЯ БАЗА ПРАВОНАРУШИТЕЛЕЙ: \n";
+	cout << "\n=======================================================\n";
+	Print(base);
+	//cout << "\t\t\t\tПОЛНАЯ БАЗА ПРАВОНАРУШИТЕЛЕЙ: \n";
 
 }
